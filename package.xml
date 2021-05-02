@@ -1,21 +1,25 @@
 <?xml version="1.0"?>
-<!-- Package metadata for the ezrassor_sim_description ROS package.
-     Written by Tiger Sachse. -->
-<package format="2">
-  <name>ezrassor_sim_description</name>
-  <license>MIT</license>
-  <version>1.1.1</version>
-  <author email="Ronald.Marrero@outlook.com">Ronald Marrero</author>
-  <maintainer email="Ronald.Marrero@outlook.com">Ronald Marrero</maintainer>
-  <url type="website">https://github.com/FlaSpaceInst/EZ-RASSOR</url>
-  <description>The EZ-RASSOR simulation model XACRO description.</description>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 
-  <!-- A list of package dependencies. -->
-  <depend>rviz</depend>
+<!-- This file specifies metadata for the ezrassor_sim_gazebo ROS package. -->
+<package format="3">
+  <name>ezrassor_sim_description</name>
+  <version>2.0.0</version>
+  <description>Build the EZRASSOR simulation model from urdf and spawn it into Gazebo</description>
+  <url type="website">https://github.com/FlaSpaceInst/ezrassor_sim_description</url>
+  <maintainer email="ez.rassor@gmail.com">EZRASSOR Team</maintainer>
+  <author email="ez.rassor@gmail.com">EZRASSOR Team</author>
+  <license>MIT</license>
+
+  <depend>gazebo_ros_pkgs</depend>
+  <depend>ros2launch</depend>
   <depend>xacro</depend>
-  <depend>roslaunch</depend>
-  <depend>gazebo_ros</depend>
-  <depend>joint_state_publisher</depend>
   <depend>robot_state_publisher</depend>
-  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>ros2_control</exec_depend>
+  <exec_depend>gazebo_ros2_control</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
 </package>
