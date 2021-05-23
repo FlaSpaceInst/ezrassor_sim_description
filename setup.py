@@ -2,14 +2,13 @@
 """
 from setuptools import setup
 import glob
-import os.path
-import os
 
 
 setup(
     name="ezrassor_sim_description",
     version="2.0.0",
-    description="Build the EZRASSOR simulation model from urdf and spawn it into Gazebo",
+    description="Build the EZRASSOR simulation model from urdf \
+        and spawn it into Gazebo",
     maintainer="EZRASSOR Team",
     maintainer_email="ez.rassor@gmail.com",
     license="MIT",

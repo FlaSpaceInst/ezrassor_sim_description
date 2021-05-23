@@ -6,11 +6,12 @@
     <xacro:property name="cameraSize" value="0.01"/>
     <xacro:property name="cameraMass" value="0.1"/>
 
+    <!--Gazebo included file contains plugins and plugin values-->
     <xacro:include filename="$(find ezrassor_sim_description)/urdf/ezrassor.gazebo" />
     <xacro:include filename="$(find ezrassor_sim_description)/urdf/materials.xacro" />
     <xacro:include filename="$(find ezrassor_sim_description)/urdf/macros.xacro" />
 
-    <!--Below are all of the robot's Links/-->
+    <!--Tags below represent robot links and joints only-->
     <link name='base_link'>
         <pose>0 0 0 0 0 0</pose>
     </link>
@@ -209,12 +210,6 @@
     </link>
 
     <link name="drum_back">
-        <!-- <collision name="collision">
-      <origin xyz="0 0 0" rpy="0 0 3.14159"/>
-      <geometry>
-        <robot_arm_drum />
-      </geometry>
-    </collision> -->
         <collision name="collision">
             <origin xyz="0 0 0" rpy="0 1.5707 1.5707"/>
             <geometry>
@@ -382,53 +377,5 @@
         <limit effort="100" velocity="100"/>
         <joint_properties damping="0.0" friction="0.0"/>
     </joint>
-
-    <ros2_control name="GazeboSystem" type="system">
-        <hardware>
-            <plugin>gazebo_ros2_control/GazeboSystem</plugin>
-        </hardware>
-        <joint name="left_wheel_front_hinge">
-            <command_interface name="velocity">
-                <param name="min">-10</param>
-                <param name="max">10</param>
-            </command_interface>
-            <state_interface name="position" />
-            <state_interface name="velocity" />
-            <state_interface name="effort" />
-        </joint>
-        <joint name="right_wheel_front_hinge">
-            <command_interface name="velocity">
-                <param name="min">-10</param>
-                <param name="max">10</param>
-            </command_interface>
-            <state_interface name="position" />
-            <state_interface name="velocity" />
-            <state_interface name="effort" />
-        </joint>
-        <joint name="left_wheel_back_hinge">
-            <command_interface name="velocity">
-                <param name="min">-10</param>
-                <param name="max">10</param>
-            </command_interface>
-            <state_interface name="position" />
-            <state_interface name="velocity" />
-            <state_interface name="effort" />
-        </joint>
-        <joint name="right_wheel_back_hinge">
-            <command_interface name="velocity">
-                <param name="min">-10</param>
-                <param name="max">10</param>
-            </command_interface>
-            <state_interface name="position" />
-            <state_interface name="velocity" />
-            <state_interface name="effort" />
-        </joint>
-    </ros2_control>
-
-    <gazebo>
-        <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
-            <parameters>$(find ezrassor_sim_description)/config/controllers.yaml</parameters>
-        </plugin>
-    </gazebo>
 
 </robot>
