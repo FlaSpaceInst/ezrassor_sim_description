@@ -31,16 +31,16 @@ ros2 launch ezrassor_sim_description spawn_ezrassor.py robot_name:=ezrassor_1
 
 testing
 -------
-Changes to this package will run through the test scripts found in the `test/` folder which include:
+Changes to this package will run through the linters specified in the GitHub Actions workflow which include:
 - Black formatting check
 - PEP8 compliance check
-- Environment hooks check for Gazebo
 
-These tests will run automatically when changes are checked in via GitHub actions.  
+These tests will run automatically when changes are checked in to the `development` branch.  
 
-Before you check in changes, please test your changes locally with Docker:
+Before you check in changes, please test your changes locally:
+
 ```sh
-docker build -f build/Dockerfile -t ezrassor_sim_gazebo .
-docker run ezrassor_sim_gazebo /check-environment.sh
-docker run ezrassor_sim_gazebo /lint.sh
+python3 -m pip install --upgrade black flake8
+python3 -m black --check .
+python3 -m flake8 .
 ```
