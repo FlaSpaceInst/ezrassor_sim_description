@@ -163,6 +163,25 @@ def generate_launch_description():
         ],
     )
 
+    arms_driver_node = Node(
+        package="ezrassor_sim_description",
+        executable="arms_driver",
+        namespace=LaunchConfiguration("robot_name"),
+        output={"both": "screen"},
+    )
+    wheels_driver_node = Node(
+        package="ezrassor_sim_description",
+        executable="wheels_driver",
+        namespace=LaunchConfiguration("robot_name"),
+        output={"both": "screen"},
+    )
+    drums_driver_node = Node(
+        package="ezrassor_sim_description",
+        executable="drums_driver",
+        namespace=LaunchConfiguration("robot_name"),
+        output={"both": "screen"},
+    )
+
     # Note that this package WILL NOT start Gazebo
     # instead, when this launch file is executed it will wait for /spawn_entity
     # to be available. This will automatically be available after Gazebo is launched
@@ -178,6 +197,9 @@ def generate_launch_description():
             y_axis_argument,
             model_file_argument,
             robot_state_publisher,
+            arms_driver_node,
+            wheels_driver_node,
+            drums_driver_node,
             OpaqueFunction(function=__spawn_robot),
         ]
     )

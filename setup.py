@@ -21,6 +21,8 @@ setup(
         "Topic :: Scientific/Engineering :: Astronomy",
         "Topic :: Scientific/Engineering :: Physics",
     ],
+    packages=["arms_driver", "wheels_driver", "drums_driver"],
+    package_dir={"": "source"},
     install_requires=["setuptools"],
     data_files=[
         (
@@ -36,4 +38,11 @@ setup(
         ("share/ezrassor_sim_description/config", glob.glob("config/*")),
     ],
     tests_require=["pytest"],
+    entry_points={
+        "console_scripts": [
+            "arms_driver = arms_driver.__main__:main",
+            "wheels_driver = wheels_driver.__main__:main",
+            "drums_driver = drums_driver.__main__:main",
+        ],
+    },
 )
