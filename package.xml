@@ -5,7 +5,7 @@
 <package format="3">
   <name>ezrassor_sim_description</name>
   <version>2.0.0</version>
-  <description>Build the EZRASSOR simulation model from urdf and spawn it into Gazebo</description>
+  <description>Build the EZRASSOR simulation model from URDF and spawn it in Gazebo</description>
   <url type="website">https://github.com/FlaSpaceInst/ezrassor_sim_description</url>
   <maintainer email="ez.rassor@gmail.com">EZRASSOR Team</maintainer>
   <author email="ez.rassor@gmail.com">EZRASSOR Team</author>

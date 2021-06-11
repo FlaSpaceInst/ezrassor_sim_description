@@ -5,6 +5,28 @@ ezrassor_sim_description
 
 The `ezrassor_sim_description` package contains the xacro description for the ezrassor robot and spawns a new robot into a running Gazebo simulation.
 
+topics
+------
+```
+ezrassor_sim_description -> /drum_front_hinge
+ezrassor_sim_description -> /drum_back_hinge
+ezrassor_sim_description -> /front_camera/camera_info
+ezrassor_sim_description -> /front_camera/depth/camera_info
+ezrassor_sim_description -> /front_camera/depth/image_raw
+ezrassor_sim_description -> /front_camera/depth/image_raw/compressedDepth
+ezrassor_sim_description -> /front_camera/depth/image_raw/theora
+ezrassor_sim_description -> /front_camera/image_raw
+ezrassor_sim_description -> /front_camera/image_raw/compressed
+ezrassor_sim_description -> /front_camera/image_raw/compressedDepth
+ezrassor_sim_description -> /front_camera/image_raw/theora
+ezrassor_sim_description -> /front_camera/points
+ezrassor_sim_description -> /ft_sensor_drum_back
+ezrassor_sim_description -> /ft_sensor_drum_front
+ezrassor_sim_description -> /imu_plugin/out
+ezrassor_sim_description -> /joint_states
+ezrassor_sim_description -> /robot_description
+```
+
 usage
 -----
 ```
@@ -12,14 +34,14 @@ command:
   ros2 launch ezrassor_sim_description spawn_ezrassor.py [argument:=value]
 
 optional arguments:
-  x             [lowercase] float value representing the spawn value for the robot along the x axis in Gazebo (default 0.0)
-  y             [lowercase] float value representing the spawn value for the robot along the y axis in Gazebo (default 0.0)
-  z             [lowercase] float value representing the spawn value for the robot along the z axis in Gazebo (default 0.0)
-  R             [UPPERCASE] float value representing the spawn roll degree for the robot in Gazebo (default 0.0)
-  P             [UPPERCASE] float value representing the spawn pitch degree for the robot in Gazebo (default 0.0)
-  Y             [UPPERCASE] float value representing the spawn yaw degree for the robot in Gazebo (default 0.0)
-  robot_name    string value for the unique name of the robot, used for topic name and namespace (default ezrassor)
-  model         string value for the full path of the robot xacro file (default ezrassor_sim_description/urdf/ezrassor.xacro)
+  x             [lowercase] float value representing the spawn value for the robot along the x axis in Gazebo (default: 0.0)
+  y             [lowercase] float value representing the spawn value for the robot along the y axis in Gazebo (default: 0.0)
+  z             [lowercase] float value representing the spawn value for the robot along the z axis in Gazebo (default: 0.0)
+  R             [UPPERCASE] float value representing the spawn roll degree for the robot in Gazebo (default: 0.0)
+  P             [UPPERCASE] float value representing the spawn pitch degree for the robot in Gazebo (default: 0.0)
+  Y             [UPPERCASE] float value representing the spawn yaw degree for the robot in Gazebo (default: 0.0)
+  robot_name    string value for the unique name of the robot, used for topic name and namespace (default: ezrassor)
+  model         string value for the full path of the robot xacro file (default: ezrassor_sim_description/urdf/ezrassor.xacro)
 ```
 
 example
