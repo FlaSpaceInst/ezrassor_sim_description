@@ -28,24 +28,8 @@
         </xacro:unless>
     </xacro:macro>
 
-    <!-- VISUAL AND COLLISION MACROS -->
-    <xacro:macro name="robot_arm">
-        <mesh filename="file://$(find ezrassor_sim_description)/meshes/drum_arm_short.dae" scale="1.0 1.0 1.0"></mesh>
-    </xacro:macro>
-
-    <xacro:macro name="robot_arm_drum">
-        <mesh filename="file://$(find ezrassor_sim_description)/meshes/drum.dae" scale="0.35 0.35 0.35"></mesh>
-    </xacro:macro>
-
-    <xacro:macro name="robot_wheel">
-        <mesh filename="file://$(find ezrassor_sim_description)/meshes/wheel.dae" scale="0.35 0.35 0.35"></mesh>
-    </xacro:macro>
-
     <xacro:macro name="base_unit">
         <mesh filename="file://$(find ezrassor_sim_description)/meshes/base_unit.dae" scale="0.35 0.35 0.35"></mesh>
     </xacro:macro>
 
-    <xacro:macro name="drum_arm">
-        <mesh filename="file://$(find ezrassor_sim_description)/meshes/drum_arm.dae" scale="0.35 0.35 0.35"></mesh>
-    </xacro:macro>
 </robot>

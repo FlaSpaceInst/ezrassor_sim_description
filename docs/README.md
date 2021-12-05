@@ -1,6 +1,6 @@
 ezrassor_sim_description
 ---------------------
-![Build Badge](https://github.com/FlaSpaceInst/ezrassor_sim_gazebo/workflows/Build/badge.svg) 
+![Build Badge](https://github.com/FlaSpaceInst/ezrassor_sim_description/workflows/Build/badge.svg) 
 ![Style Badge](https://img.shields.io/badge/Code%20Style-black-000000.svg)
 
 The `ezrassor_sim_description` package contains the xacro description for the ezrassor robot and spawns a new robot into a running Gazebo simulation.

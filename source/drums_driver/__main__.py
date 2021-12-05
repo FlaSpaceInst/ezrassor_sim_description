@@ -7,10 +7,11 @@ that represent the velocity that should be applied to raising or lowering the ar
 
 The abstraction done by this node is necessary to be able to switch
 between hardware and software; a similarly written hardware node could
-listen to the same istructions topic and command actuators, instead of the sim.
+listen to the same instructions topic and command actuators, instead of the sim.
 """
 import std_msgs.msg
 import rclpy
+from rclpy.node import Node
 
 NODE = "drums_driver"
 FRONT_DRUMS_EXTERNAL_TOPIC = "front_drum_instructions"
@@ -21,56 +22,59 @@ BACK_DRUMS_INTERNAL_TOPIC = "drum_back_velocity_controller/command"
 QUEUE_SIZE = 10
 MAX_DRUM_SPEED = 5
 
-# Dictionary values set after publishers get created in main()
-publishers = {}
 
+class DrumsSubscriber(Node):
+    """Create a DRUMS_EXTERNAL_TOPIC subscriber node"""
 
-def handle_front_drum_movements(data):
-    """Move the front drum of the robot per
-    the commands encoded in the instruction.
-    """
-    publishers[FRONT_DRUMS_INTERNAL_TOPIC].publish(data.data * MAX_DRUM_SPEED)
+    def __init__(self):
+        """
+        Class constructor for this subscriber node
+        """
+        super().__init__("drums_driver")
 
+        self.front_drums_subscription = self.create_subscription(
+            std_msgs.msg.Float64,
+            FRONT_DRUMS_EXTERNAL_TOPIC,
+            self.handle_front_drum_movements,
+            QUEUE_SIZE,
+        )
 
-def handle_back_drum_movements(data):
-    """Move the back drum of the robot per
-    the commands encoded in the instruction.
-    """
-    publishers[BACK_DRUMS_INTERNAL_TOPIC].publish(data.data * MAX_DRUM_SPEED)
+        self.back_drums_subscription = self.create_subscription(
+            std_msgs.msg.Float64,
+            BACK_DRUMS_EXTERNAL_TOPIC,
+            self.handle_back_drum_movements,
+            QUEUE_SIZE,
+        )
 
-
-def main(passed_args=None):
-    """Main entry point for the ROS node."""
-    try:
-        rclpy.init(args=passed_args)
-        node = rclpy.create_node(NODE)
-
-        # Create publishers to Gazebo velocity managers.
-        publishers[FRONT_DRUMS_INTERNAL_TOPIC] = node.create_publisher(
+        self.front_drums_publisher = self.create_publisher(
             std_msgs.msg.Float64, FRONT_DRUMS_INTERNAL_TOPIC, QUEUE_SIZE
         )
-        publishers[BACK_DRUMS_INTERNAL_TOPIC] = node.create_publisher(
+
+        self.back_drums_publisher = self.create_publisher(
             std_msgs.msg.Float64, BACK_DRUMS_INTERNAL_TOPIC, QUEUE_SIZE
         )
 
-        # Create subscriptions to listen for specific robot actions from users.
-        node.create_subscription(
-            std_msgs.msg.Float64,
-            FRONT_DRUMS_EXTERNAL_TOPIC,
-            handle_front_drum_movements,
-            QUEUE_SIZE,
-        )
-        node.create_subscription(
-            std_msgs.msg.Float64,
-            BACK_DRUMS_EXTERNAL_TOPIC,
-            handle_back_drum_movements,
-            QUEUE_SIZE,
-        )
+        self.get_logger().info("drums_driver node created successfully")
 
-        node.get_logger().info("drums_driver node created successfully")
+    def handle_front_drum_movements(self, data: std_msgs.msg.Float64):
+        """Move the front drum of the robot per
+        the commands encoded in the instruction
+        """
+        self.front_drums_publisher.publish(data.data * MAX_DRUM_SPEED)
 
-        # Spin!
-        rclpy.spin(node)
+    def handle_back_drum_movements(self, data: std_msgs.msg.Float64):
+        """Move the back drum of the robot per
+        the commands encoded in the instruction
+        """
+        self.back_drums_publisher.publish(data.data * MAX_DRUM_SPEED)
+
+
+def main(passed_args=None):
+    """Main entry point for the ROS node"""
+    try:
+        rclpy.init(args=passed_args)
+        drums_subscriber = DrumsSubscriber()
+        rclpy.spin(drums_subscriber)
 
     except KeyboardInterrupt:
         pass

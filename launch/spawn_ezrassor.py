@@ -1,7 +1,8 @@
-"""Launch Gazebo with the specified world file (empty world by default)."""
+"""Launch Gazebo with the specified world file (empty world by default)"""
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions.opaque_function import OpaqueFunction
+from launch.substitutions.find_executable import FindExecutable
 from launch_ros.actions import Node
 from launch.event_handlers import OnProcessExit
 from launch.actions import (
@@ -9,12 +10,20 @@ from launch.actions import (
     ExecuteProcess,
     RegisterEventHandler,
 )
-from launch.substitutions import LaunchConfiguration, Command
+from launch.substitutions import (
+    LaunchConfiguration,
+    Command,
+    PathJoinSubstitution,
+)
 import os
 
 
 def __spawn_robot(context, *args, **kwargs):
     """Returns the nodes for spawning a unique robot in Gazebo."""
+
+    pkg_ezrassor_sim_description = os.path.join(
+        get_package_share_directory("ezrassor_sim_description")
+    )
 
     # Make sure that the robot name does not have a leading /
     # (this variable is what the spawn_entity service will use as a unique name)
@@ -22,11 +31,36 @@ def __spawn_robot(context, *args, **kwargs):
     if robot_name[0] == "/":
         robot_name = robot_name[1:]
 
+    xacro_file = os.path.join(
+        pkg_ezrassor_sim_description, "urdf", "ezrassor.xacro.urdf"
+    )
+
+    robot_description_content = Command(
+        [
+            PathJoinSubstitution([FindExecutable(name="xacro")]),
+            " ",
+            xacro_file,
+            " ",
+            "name:=",
+            robot_name,
+        ]
+    )
+    params = {"robot_description": robot_description_content}
+
     # Since we are building the namespace off of the robot name, ensure
     # it has a leading /
     namespace = robot_name
     if namespace[0] != "/":
         namespace = f"/{namespace}"
+
+    # State publisher needs to be tied to the unique instance of the robot
+    robot_state_publisher = Node(
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
+        namespace=LaunchConfiguration("robot_name"),
+        output="screen",
+        parameters=[params],
+    )
 
     spawn_entity = Node(
         package="gazebo_ros",
@@ -55,49 +89,136 @@ def __spawn_robot(context, *args, **kwargs):
         output="screen",
     )
 
+    # controllers must be loaded here as part of the spawn or else the
+    # gazebo_ros controls won't know what to make controllers for
     load_joint_state_controller = ExecuteProcess(
         cmd=[
             "ros2",
             "control",
             "load_controller",
-            "--state",
+            "-c",
+            f"/{robot_name}/controller_manager",
+            "--set-state",
             "start",
-            "joint_state_controller",
+            "joint_state_broadcaster",
         ],
         output="screen",
     )
-    joint_state_handler = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=spawn_entity, on_exit=[load_joint_state_controller]
-        )
-    )
 
-    load_velocity_controller = ExecuteProcess(
+    load_diff_drive_controller = ExecuteProcess(
         cmd=[
             "ros2",
             "control",
             "load_controller",
-            "--state",
+            "-c",
+            f"/{robot_name}/controller_manager",
+            "--set-state",
             "start",
-            "velocity_controller",
+            "diff_drive_controller",
         ],
         output="screen",
     )
-    velocity_state_handler = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=load_joint_state_controller,
-            on_exit=[load_velocity_controller],
-        )
+
+    load_arm_front_velocity_controller = ExecuteProcess(
+        cmd=[
+            "ros2",
+            "control",
+            "load_controller",
+            "-c",
+            f"/{robot_name}/controller_manager",
+            "--set-state",
+            "start",
+            "arm_front_velocity_controller",
+        ],
+        output="screen",
     )
-    return [joint_state_handler, velocity_state_handler, spawn_entity]
+
+    load_arm_back_velocity_controller = ExecuteProcess(
+        cmd=[
+            "ros2",
+            "control",
+            "load_controller",
+            "-c",
+            f"/{robot_name}/controller_manager",
+            "--set-state",
+            "start",
+            "arm_back_velocity_controller",
+        ],
+        output="screen",
+    )
+
+    load_drum_front_velocity_controller = ExecuteProcess(
+        cmd=[
+            "ros2",
+            "control",
+            "load_controller",
+            "-c",
+            f"/{robot_name}/controller_manager",
+            "--set-state",
+            "start",
+            "drum_front_velocity_controller",
+        ],
+        output="screen",
+    )
+
+    load_drum_back_velocity_controller = ExecuteProcess(
+        cmd=[
+            "ros2",
+            "control",
+            "load_controller",
+            "-c",
+            f"/{robot_name}/controller_manager",
+            "--set-state",
+            "start",
+            "drum_back_velocity_controller",
+        ],
+        output="screen",
+    )
+
+    return [
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=spawn_entity,
+                on_exit=[load_joint_state_controller],
+            )
+        ),
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=load_joint_state_controller,
+                on_exit=[load_diff_drive_controller],
+            )
+        ),
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=load_joint_state_controller,
+                on_exit=[load_arm_front_velocity_controller],
+            )
+        ),
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=load_joint_state_controller,
+                on_exit=[load_arm_back_velocity_controller],
+            )
+        ),
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=load_joint_state_controller,
+                on_exit=[load_drum_front_velocity_controller],
+            )
+        ),
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=load_joint_state_controller,
+                on_exit=[load_drum_back_velocity_controller],
+            )
+        ),
+        robot_state_publisher,
+        spawn_entity,
+    ]
 
 
 def generate_launch_description():
     """Spawn a new instance of Gazebo Classic with an optional world file."""
-
-    pkg_ezrassor_sim_description = get_package_share_directory(
-        "ezrassor_sim_description"
-    )
 
     robot_name_argument = DeclareLaunchArgument(
         "robot_name",
@@ -119,7 +240,7 @@ def generate_launch_description():
     )
     z_position_argument = DeclareLaunchArgument(
         "z",
-        default_value="0.0",
+        default_value="0.2",
         description="Z position for robot spawn: [float]",
     )
     r_axis_argument = DeclareLaunchArgument(
@@ -136,31 +257,6 @@ def generate_launch_description():
         "Y",
         default_value="0.0",
         description="Yaw angle for robot spawn: [float]",
-    )
-
-    ezrassor_model = os.path.join(
-        pkg_ezrassor_sim_description, "urdf", "ezrassor.xacro"
-    )
-    model_file_argument = DeclareLaunchArgument(
-        name="model",
-        default_value=ezrassor_model,
-        description="Absolute path to robot urdf file",
-    )
-
-    # State publisher needs to be tied to the unique instance of the robot
-    robot_state_publisher = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        namespace=LaunchConfiguration("robot_name"),
-        name="robot_state_publisher",
-        output="screen",
-        parameters=[
-            {
-                "robot_description": Command(
-                    ["xacro ", LaunchConfiguration("model")]
-                )
-            }
-        ],
     )
 
     arms_driver_node = Node(
@@ -195,11 +291,9 @@ def generate_launch_description():
             r_axis_argument,
             p_axis_argument,
             y_axis_argument,
-            model_file_argument,
-            robot_state_publisher,
-            arms_driver_node,
-            wheels_driver_node,
-            drums_driver_node,
             OpaqueFunction(function=__spawn_robot),
+            wheels_driver_node,
+            arms_driver_node,
+            drums_driver_node,
         ]
     )

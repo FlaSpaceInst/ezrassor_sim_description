@@ -1,66 +1,101 @@
-controller_manager:
-  ros__parameters:
-    update_rate: 100  # Hz
+ezrassor:  
+  controller_manager:
+    ros__parameters:
+      update_rate: 1000  # Hz
 
-    velocity_controller:
-      type: velocity_controllers/JointGroupVelocityController
+      diff_drive_controller:
+        type: diff_drive_controller/DiffDriveController
 
-    joint_state_controller:
-      type: joint_state_controller/JointStateController
+      joint_state_broadcaster:
+        type: joint_state_broadcaster/JointStateBroadcaster
+  
+      arm_front_velocity_controller:
+        type: velocity_controllers/JointGroupVelocityController
 
-    diffdrive_controller:
-      type: diff_drive_controller/DiffDriveController
+      arm_back_velocity_controller:
+        type: velocity_controllers/JointGroupVelocityController
+      
+      drum_front_velocity_controller:
+        type: velocity_controllers/JointGroupVelocityController
 
-velocity_controller:
-  ros__parameters:
-    joints:
-      - left_wheel_front_hinge
-      - right_wheel_front_hinge
-      - left_wheel_back_hinge
-      - right_wheel_back_hinge
+      drum_back_velocity_controller:
+        type: velocity_controllers/JointGroupVelocityController
 
-diff_drive_controller:
-  ros__parameters:
-    left_wheel_names: [ 'left_wheel_front_hinge', 'left_wheel_back_hinge' ]
-    right_wheel_names: [ 'right_wheel_front_hinge', 'right_wheel_back_hinge' ]
+  diff_drive_controller:
+    ros__parameters:
+      left_wheel_names: [ "left_wheel_front_joint", "left_wheel_back_joint" ]
+      right_wheel_names: [ "right_wheel_front_joint", "right_wheel_back_joint" ]
 
-    # Separation between a left and right wheel in meters
-    wheel_separation: 0.4
+      # Separation between a left and right wheel in meters
+      wheel_separation: 0.10
 
-    wheel_radius: 0.18
+      wheel_radius: 0.18
 
-    # Setting the timeout to INT_MAX (~68 years) until we can migrate all of our
-    # controllers to publish commands continuously instead of discretely.
-    #
-    # This timeout means that when a controller receives a message, it will cancel the message if 
-    # another message has not been received in X amount of time, where x is the timeout value.
-    #
-    # The mobile app currently works by only sending a message when a movement is intended,
-    # and then another message when the robot should stop.
-    cmd_vel_timeout: 2147483647
+      wheel_separation_multiplier: 1.0
+      left_wheel_radius_multiplier: 1.0
+      right_wheel_radius_multiplier: 1.0
 
-    # Publish the odometry to separate topic or not; false to work w/ Kalman Filter
-    enable_odom_tf: false
+      publish_rate: 50.0
+      odom_frame_id: odom
+      base_frame_id: base_link
+      pose_covariance_diagonal : [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+      twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
 
-    # Default covariance values from example on diff drive controller wiki
-    pose_covariance_diagonal: [0.001, 0.001, 1000000.0, 1000000.0, 1000000.0, 1000.0]
-    twist_covariance_diagonal: [0.001, 0.001, 1000000.0, 1000000.0, 1000000.0, 1000.0]
+      open_loop: true
+      enable_odom_tf: true
 
-    # Frame of rover
-    base_frame_id: base_link
+      cmd_vel_timeout: 0.5
+      use_stamped_vel: false
 
-    # The ratio of max acc and max vel is same as skid steer example in diff drive controlller wiki
-    # Note: Could also include for constraints for angular but linear caps ensure rover doesn't rotate too fast
-    linear:
-      x:
-        has_velocity_limits    : true
+      # Preserve turning radius when limiting speed/acceleration/jerk
+      preserve_turning_radius: true
 
-        # Actual speed of rover is 1 meter per 3 secs, so this is sped up
-        max_velocity           : 1.0  # m/s
+      # Publish limited velocity
+      publish_cmd: true
 
-        # Match backwards speed cap
-        min_velocity           : -1.0 # m/s
+      # Publish wheel data
+      publish_wheel_data: true
 
-        has_acceleration_limits: true
-        max_acceleration       : 1.0  # m/s^2
-        min_acceleration       : -1.0 # m/s^2
+      # Velocity and acceleration limits
+      linear.x.has_velocity_limits: true
+      linear.x.has_acceleration_limits: true
+      linear.x.has_jerk_limits: false
+      linear.x.max_velocity: 10.0
+      linear.x.min_velocity: -10.0
+      linear.x.max_acceleration: 2.0
+      linear.x.max_jerk: 0.0
+      linear.x.min_jerk: 0.0
+
+      angular.z.has_velocity_limits: true
+      angular.z.has_acceleration_limits: true
+      angular.z.has_jerk_limits: false
+      angular.z.max_velocity: 1.0
+      angular.z.min_velocity: -1.0
+      angular.z.max_acceleration: 1.0
+      angular.z.min_acceleration: -1.0
+      angular.z.max_jerk: 0.0
+      angular.z.min_jerk: 0.0
+
+  arm_front_velocity_controller:
+    ros__parameters:
+        joints: 
+          - arm_front_joint
+        pid: {p: 100.0, i: 0.01, d: 10.0}
+  
+  arm_back_velocity_controller:
+    ros__parameters:
+        joints: 
+          - arm_back_joint
+        pid: {p: 100.0, i: 0.01, d: 10.0}
+
+  drum_front_velocity_controller:
+    ros__parameters:
+        joints: 
+          - drum_front_joint
+        pid: {p: 100.0, i: 0.01, d: 10.0}
+  
+  drum_back_velocity_controller:
+    ros__parameters:
+        joints: 
+          - drum_back_joint
+        pid: {p: 100.0, i: 0.01, d: 10.0}
