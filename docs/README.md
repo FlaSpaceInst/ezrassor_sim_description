@@ -25,7 +25,9 @@ optional arguments:
 example
 --------
 Launch the Gazebo client with the name `ezrassor_1`:
-```
+``` sh
+# First launch Gazebo and then spawn the robot with the controller manager
+ros2 launch ezrassor_sim_gazebo gazebo_launch.py
 ros2 launch ezrassor_sim_description spawn_ezrassor.py robot_name:=ezrassor_1
 ```   
 
