@@ -1,0 +1,167 @@
+<?xml version='1.0'?>
+
+<robot name="ezrassor"
+	xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:property name="cameraSize" value="0.01"/>
+	<xacro:property name="cameraMass" value="0.1"/>
+	<xacro:include filename="$(find ezrassor_sim_description)/urdf/materials.xacro" />
+	<xacro:include filename="$(find ezrassor_sim_description)/urdf/macros.xacro" />
+	<xacro:include filename="$(find ezrassor_sim_description)/urdf/wheel.xacro" />
+	<xacro:include filename="$(find ezrassor_sim_description)/urdf/drum_arm.xacro" />
+	<xacro:include filename="$(find ezrassor_sim_description)/urdf/drum.xacro" />
+	<xacro:include filename="$(find ezrassor_sim_description)/urdf/imu.xacro" />
+	
+	<!--Tags below represent robot links and joints only-->
+	<link name='base_link'>
+		<pose>0 0 0 0 0 0</pose>
+	</link>
+
+	<link name='body'>
+		<pose>0 0 0 0 0 0</pose>
+		<inertial>
+			<mass value="15.0"/>
+			<origin xyz="0 0 0" rpy=" 0 0 0"/>
+			<inertia ixx="0.5" ixy="0" ixz="0" iyy="1.0" iyz="0" izz="0.1" />
+		</inertial>
+		<collision name='collision'>
+			<origin xyz="0 0 0" rpy=" 0 0 0"/>
+			<geometry>
+				<xacro:base_unit/>
+			</geometry>
+		</collision>
+		<visual name='base_link_visual'>
+			<origin xyz="0 0 0" rpy=" 0 0 0"/>
+			<geometry>
+				<xacro:base_unit/>
+			</geometry>
+		</visual>
+	</link>
+    
+    <gazebo reference="base_link">
+        <selfCollide>0</selfCollide>
+    </gazebo>
+	
+    <joint name="body_joint" type="fixed">
+		<axis xyz="0 0 0"/>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<parent link="base_link"/>
+		<child link="body"/>
+	</joint>
+
+    <!--Macros representing different parts of the ezrassor.-->
+	<xacro:ezrassor_wheel wheel_prefix="left_wheel_front" yaw="0">
+		<origin xyz="0.20 0.285 0" rpy="0 0 0"/>
+	</xacro:ezrassor_wheel>
+
+	<xacro:ezrassor_wheel wheel_prefix="right_wheel_front" yaw="${pi}">
+		<origin xyz="0.20 -0.285 0" rpy="0 0 0"/>
+	</xacro:ezrassor_wheel>
+
+	<xacro:ezrassor_wheel wheel_prefix="left_wheel_back" yaw="0">
+		<origin xyz="-0.20 0.285 0" rpy="0 0 0"/>
+	</xacro:ezrassor_wheel>
+
+	<xacro:ezrassor_wheel wheel_prefix="right_wheel_back" yaw="${pi}">
+		<origin xyz="-0.20 -0.285 0" rpy="0 0 0"/>
+	</xacro:ezrassor_wheel>
+
+	<xacro:drum_arm arm_prefix="arm_front" front_facing="true">
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+	</xacro:drum_arm>
+	
+    <xacro:drum_arm arm_prefix="arm_back" front_facing="false">
+		<origin xyz="0 0 0" rpy="3.1415 0 3.1415"/>
+	</xacro:drum_arm>
+
+    <!-- Since the drum intertias are perpendicular to the rest of the robot, 
+        the rp values need to be rotated by pi/2 -->
+    <xacro:drum drum_prefix="drum_front" arm_prefix="arm_front" front_facing="true">
+		<origin xyz="0 0 0" rpy="1.57 1.57 0"/>
+    </xacro:drum>
+    
+    <xacro:drum drum_prefix="drum_back" arm_prefix="arm_back" front_facing="false">
+		<origin xyz="0 0 0" rpy="4.71 1.57 3.14159"/>
+    </xacro:drum>
+    			
+    <xacro:imu imu_prefix="imu" camera_size="${cameraSize}" camera_mass="${cameraMass}">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:imu>
+
+    <ros2_control name="GazeboSystem" type="system">
+        <hardware>
+            <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+        </hardware>
+        <joint name="left_wheel_front_joint">
+            <command_interface name="velocity">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+            </command_interface>
+            <state_interface name="position" />
+            <state_interface name="velocity" />
+        </joint>
+        <joint name="left_wheel_back_joint">
+            <command_interface name="velocity">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+            </command_interface>
+            <state_interface name="position" />
+            <state_interface name="velocity" />
+        </joint>
+        <joint name="right_wheel_front_joint">
+            <command_interface name="velocity">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+            </command_interface>
+            <state_interface name="position" />
+            <state_interface name="velocity" />
+        </joint>
+        <joint name="right_wheel_back_joint">
+            <command_interface name="velocity">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+            </command_interface>
+            <state_interface name="position" />
+            <state_interface name="velocity" />
+        </joint>
+        <joint name="arm_front_joint">
+            <command_interface name="velocity">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+            </command_interface>
+            <state_interface name="position" />
+            <state_interface name="velocity" />
+        </joint>
+        <joint name="arm_back_joint">
+            <command_interface name="velocity">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+            </command_interface>
+            <state_interface name="position" />
+            <state_interface name="velocity" />
+        </joint>
+        <joint name="drum_front_joint">
+            <command_interface name="velocity">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+            </command_interface>
+            <state_interface name="position" />
+            <state_interface name="velocity" />
+        </joint>
+        <joint name="drum_back_joint">
+            <command_interface name="velocity">
+                <param name="min">-10</param>
+                <param name="max">10</param>
+            </command_interface>
+            <state_interface name="position" />
+            <state_interface name="velocity" />
+        </joint>
+    </ros2_control>
+    
+    <gazebo>
+        <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
+            <parameters>$(find ezrassor_sim_description)/config/controllers.yaml</parameters>
+        </plugin>
+    </gazebo>
+
+</robot>
