@@ -76,7 +76,7 @@ class DrumsSubscriber(Node):
         back_drum_msg = Float64MultiArray()
         back_drum_msg.data = [data.data * MAX_DRUM_SPEED]
 
-        self.front_drums_publisher.publish(back_drum_msg)
+        self.back_drums_publisher.publish(back_drum_msg)
 
 
 def main(passed_args=None):
