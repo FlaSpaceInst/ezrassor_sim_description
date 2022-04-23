@@ -57,7 +57,7 @@ def __spawn_robot(context, *args, **kwargs):
     robot_state_publisher = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
-        namespace=LaunchConfiguration("robot_name"),
+        namespace=namespace,
         output="screen",
         parameters=[params],
     )
@@ -178,7 +178,8 @@ def __spawn_robot(context, *args, **kwargs):
     depth_img_to_ls = Node(
             package='depthimage_to_laserscan',
             node_executable='depthimage_to_laserscan_node',
-            node_name='depthimage_to_laserscan_node',
+            namespace=robot_name,
+            node_name=f'depthimage_to_laserscan_node_{robot_name}',
             remappings=[('depth',f'/{robot_name}/depth_camera/depth/image_raw'),
                         ('depth_camera_info', f'/{robot_name}/depth_camera/depth/camera_info'),
                         ('scan', f'/{robot_name}/obstacle_detection/combined')],
@@ -296,25 +297,6 @@ def generate_launch_description():
     )
 
     #param_config = os.path.join(get_package_share_directory('depthimage_to_laserscan'), 'cfg', 'param.yaml')
-<<<<<<< HEAD
-=======
-    depth_img_to_ls = Node(
-            package='depthimage_to_laserscan',
-            node_executable='depthimage_to_laserscan_node',
-            node_name='depthimage_to_laserscan_node',
-            remappings=[('depth','/ezrassor/depth_camera/depth/image_raw'),
-                        ('depth_camera_info', '/ezrassor/depth_camera/depth/camera_info'),
-                        ('scan', '/obstacle_detection/combined')],
-            parameters=[{
-                    "output_frame": "camera_link",
-                    "scan_time": 0.033,
-                    "range_min": 0.105,
-                    "range_max": 10.0,
-                    "scan_height": 1
-            }]
-    )
->>>>>>> d9874661e78e0bccf6130511369621c245dd82c2
-
 
     # pc_to_ls = Node(
     #         package='pointcloud_to_laserscan', executable='pointcloud_to_laserscan_node',
@@ -352,12 +334,7 @@ def generate_launch_description():
             OpaqueFunction(function=__spawn_robot),
             wheels_driver_node,
             arms_driver_node,
-<<<<<<< HEAD
             drums_driver_node
-=======
-            drums_driver_node,
-            depth_img_to_ls
->>>>>>> d9874661e78e0bccf6130511369621c245dd82c2
             #pc_to_ls
         ]
     )
