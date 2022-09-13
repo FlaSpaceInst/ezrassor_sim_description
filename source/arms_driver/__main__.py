@@ -30,14 +30,18 @@ def handle_front_arm_movements(data):
     """Move the front arm of the robot per
     the commands encoded in the instruction.
     """
-    publishers[FRONT_ARMS_INTERNAL_TOPIC].publish(data.data * MAX_ARM_SPEED)
+    msg = std_msgs.msg.Float64()
+    msg.data = data.data * MAX_ARM_SPEED
+    publishers[FRONT_ARMS_INTERNAL_TOPIC].publish(msg)
 
 
 def handle_back_arm_movements(data):
     """Move the front arm of the robot per
     the commands encoded in the instruction.
     """
-    publishers[BACK_ARMS_INTERNAL_TOPIC].publish(data.data * MAX_ARM_SPEED)
+    msg = std_msgs.msg.Float64()
+    msg.data = data.data * MAX_ARM_SPEED
+    publishers[BACK_ARMS_INTERNAL_TOPIC].publish(msg)
 
 
 def main(passed_args=None):
